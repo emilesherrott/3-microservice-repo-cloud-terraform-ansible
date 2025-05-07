@@ -1,4 +1,6 @@
 - hosts: production
+  vars_files:
+    - ../variables.yml
   become: true
   tasks:
     - name: Update packages
@@ -28,7 +30,7 @@
     - name: Clone repo into ec2-user home
       git:
         repo: "{{project_repo}}"
-        dest: /home/ec2-user/
+        dest: /home/ec2-user/{{repo_name}}
         version: main
         force: yes
         update: yes
@@ -47,14 +49,8 @@
         executable: /bin/bash
       become: true
 
-    - name: Navigate to directory containing docker-compose.yml
-      shell: cd devops-assessment
-      args:
-        chdir: /home/ec2-user/{{repo_name}}
-      become: true
-
     - name: Run docker-compose
       shell: docker-compose up -d
       args:
-        chdir: /home/ec2-user/devops-assessment
+        chdir: /home/ec2-user/{{repo_name}}
       become: true
